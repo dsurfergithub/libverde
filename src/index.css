@@ -1,0 +1,229 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+/*
+  LibVerde — sistema de diseño
+  Escena: 23:40, móvil en la mano tras una sesión de código, habitación a oscuras,
+  dictando lo que has hecho antes de olvidarlo. De ahí: dark por defecto, light
+  para el escritorio del domingo (cierre de semana).
+  Estrategia de color: Restrained. El verde musgo es acción y estado, nunca decoración.
+*/
+
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+
+  --color-idea: var(--k-idea);
+  --color-idea-soft: var(--k-idea-soft);
+  --color-pendiente: var(--k-pendiente);
+  --color-pendiente-soft: var(--k-pendiente-soft);
+  --color-sesion: var(--k-sesion);
+  --color-sesion-soft: var(--k-sesion-soft);
+
+  --font-sans: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --radius-card: 14px;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --z-sticky: 20;
+  --z-sheet-backdrop: 40;
+  --z-sheet: 50;
+  --z-toast: 60;
+}
+
+:root {
+  color-scheme: light dark;
+
+  /* Light — el escritorio del domingo */
+  --bg: oklch(1 0 0);
+  --surface: oklch(0.976 0.005 150);
+  --surface-2: oklch(0.945 0.008 150);
+  --line: oklch(0.9 0.01 150);
+  --ink: oklch(0.22 0.02 150);
+  --muted: oklch(0.5 0.016 150);
+  --primary: oklch(0.45 0.13 150);
+  --primary-ink: oklch(0.99 0.005 150);
+  --primary-soft: oklch(0.94 0.035 150);
+
+  --k-idea: oklch(0.52 0.13 75);
+  --k-idea-soft: oklch(0.95 0.05 85);
+  --k-pendiente: oklch(0.52 0.16 28);
+  --k-pendiente-soft: oklch(0.95 0.04 30);
+  --k-sesion: oklch(0.5 0.11 250);
+  --k-sesion-soft: oklch(0.95 0.03 250);
+
+  --shadow-sheet: 0 -8px 40px oklch(0.2 0.02 150 / 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark — la medianoche en el sofá */
+    --bg: oklch(0.145 0.008 150);
+    --surface: oklch(0.185 0.011 150);
+    --surface-2: oklch(0.23 0.013 150);
+    --line: oklch(0.29 0.014 150);
+    --ink: oklch(0.95 0.008 150);
+    --muted: oklch(0.68 0.014 150);
+    --primary: oklch(0.74 0.145 150);
+    --primary-ink: oklch(0.18 0.03 150);
+    --primary-soft: oklch(0.29 0.05 150);
+
+    --k-idea: oklch(0.82 0.14 82);
+    --k-idea-soft: oklch(0.3 0.05 82);
+    --k-pendiente: oklch(0.72 0.15 30);
+    --k-pendiente-soft: oklch(0.3 0.06 30);
+    --k-sesion: oklch(0.75 0.11 250);
+    --k-sesion-soft: oklch(0.3 0.05 250);
+
+    --shadow-sheet: 0 -8px 40px oklch(0 0 0 / 0.5);
+  }
+}
+
+/* Anulación manual desde Ajustes */
+:root[data-theme='light'] {
+  --bg: oklch(1 0 0);
+  --surface: oklch(0.976 0.005 150);
+  --surface-2: oklch(0.945 0.008 150);
+  --line: oklch(0.9 0.01 150);
+  --ink: oklch(0.22 0.02 150);
+  --muted: oklch(0.5 0.016 150);
+  --primary: oklch(0.45 0.13 150);
+  --primary-ink: oklch(0.99 0.005 150);
+  --primary-soft: oklch(0.94 0.035 150);
+  --k-idea: oklch(0.52 0.13 75);
+  --k-idea-soft: oklch(0.95 0.05 85);
+  --k-pendiente: oklch(0.52 0.16 28);
+  --k-pendiente-soft: oklch(0.95 0.04 30);
+  --k-sesion: oklch(0.5 0.11 250);
+  --k-sesion-soft: oklch(0.95 0.03 250);
+  --shadow-sheet: 0 -8px 40px oklch(0.2 0.02 150 / 0.14);
+}
+
+:root[data-theme='dark'] {
+  --bg: oklch(0.145 0.008 150);
+  --surface: oklch(0.185 0.011 150);
+  --surface-2: oklch(0.23 0.013 150);
+  --line: oklch(0.29 0.014 150);
+  --ink: oklch(0.95 0.008 150);
+  --muted: oklch(0.68 0.014 150);
+  --primary: oklch(0.74 0.145 150);
+  --primary-ink: oklch(0.18 0.03 150);
+  --primary-soft: oklch(0.29 0.05 150);
+  --k-idea: oklch(0.82 0.14 82);
+  --k-idea-soft: oklch(0.3 0.05 82);
+  --k-pendiente: oklch(0.72 0.15 30);
+  --k-pendiente-soft: oklch(0.3 0.06 30);
+  --k-sesion: oklch(0.75 0.11 250);
+  --k-sesion-soft: oklch(0.3 0.05 250);
+  --shadow-sheet: 0 -8px 40px oklch(0 0 0 / 0.5);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+/* Foco visible y consistente en toda la app */
+:where(button, a, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+}
+
+@layer utilities {
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.animate-sheet-in {
+  animation: sheet-in 260ms var(--ease-out-quart);
+}
+.animate-fade-in {
+  animation: fade-in 180ms var(--ease-out-quart);
+}
+.animate-pulse-ring {
+  animation: pulse-ring 1600ms var(--ease-out-quart) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-sheet-in,
+  .animate-fade-in {
+    animation: fade-in 1ms linear;
+  }
+  .animate-pulse-ring {
+    display: none;
+  }
+}

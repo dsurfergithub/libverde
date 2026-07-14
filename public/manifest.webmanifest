@@ -1,0 +1,20 @@
+{
+  "name": "LibVerde",
+  "short_name": "LibVerde",
+  "description": "Libreta inteligente de proyectos: dicta, mide sesiones y genera tu memoria semanal en Markdown.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d140f",
+  "theme_color": "#0d140f",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
