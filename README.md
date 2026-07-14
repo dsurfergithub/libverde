@@ -50,8 +50,9 @@ Con **File System Access API** eliges la carpeta del vault una vez y LibVerde es
 ## Decisiones
 
 - **Confirmación de un toque.** La IA se equivoca. Tras dictar sale una tarjeta editable; nunca se guarda en silencio. Datos mal clasificados envenenan los insights, que son justo el producto.
-- **Pomodoro por `startedAt`.** El navegador mata los temporizadores en segundo plano, así que el tiempo se calcula contra el reloj. Puedes bloquear el móvil.
-- **La sesión retroactiva por voz es el camino principal** («he trabajado 25 minutos en X»); el cronómetro es el secundario.
+- **Sesiones sin cuenta atrás.** Le das a *Empezar* y, al terminar, **eliges la hora de fin** (y corriges la de inicio si hace falta). Es el caso real: te acuerdas a las 23:40 de que paraste a las 22:15. El tiempo se calcula contra el reloj, así que puedes bloquear el móvil o cerrar la pestaña.
+- **La sesión retroactiva por voz también vale** («he trabajado 25 minutos en X»).
+- **Categorías que tú defines** (Trabajo, Ocio, Cliente X…). Agrupan la portada, reparten el tiempo en los insights y entran en el frontmatter de la memoria (`minutos_por_categoria`), así que Dataview las puede consultar.
 - **Las memorias se congelan al cerrarlas.** Si luego añades entradas viejas, te avisa de que está desactualizada; no se reescribe sola.
 - **Las ideas tienen bucle de salida.** El cierre de semana te obliga a matarlas o promoverlas. Sin eso, «ideas pendientes» solo es un número que crece.
 - **Funciona sin API key.** Escribes a mano, los audios se encolan y la memoria sale con tus entradas literales.

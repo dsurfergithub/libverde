@@ -9,7 +9,7 @@ import { daysSince, formatMinutes, plural } from '../lib/time'
  */
 export function Insights() {
   const db = useDB()
-  const { ranking, stale, ideasStacked, silent, totalMin, prevMin } = insights(db)
+  const { ranking, stale, ideasStacked, silent, totalMin, prevMin, byCategory } = insights(db)
 
   const top = ranking[0]
   const project = (id: string) => db.projects.find((p) => p.id === id)?.name ?? 'Sin proyecto'
@@ -37,6 +37,37 @@ export function Insights() {
           Últimos 7 días. Números, no adivinación.
         </p>
       </header>
+
+      {byCategory.length > 1 && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-[15px] font-semibold">En qué se te va la semana</h2>
+          <div className="flex h-2.5 overflow-hidden rounded-full bg-surface-2">
+            {byCategory.map((c, i) => (
+              <div
+                key={c.categoria}
+                title={`${c.categoria}: ${formatMinutes(c.minutos)}`}
+                className={i === 0 ? 'bg-primary' : i === 1 ? 'bg-sesion' : i === 2 ? 'bg-idea' : 'bg-muted'}
+                style={{ width: `${c.pct * 100}%` }}
+              />
+            ))}
+          </div>
+          <ul className="tnum flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
+            {byCategory.map((c, i) => (
+              <li key={c.categoria} className="flex items-center gap-1.5">
+                <span
+                  className={`size-2 rounded-full ${
+                    i === 0 ? 'bg-primary' : i === 1 ? 'bg-sesion' : i === 2 ? 'bg-idea' : 'bg-muted'
+                  }`}
+                />
+                <span>{c.categoria}</span>
+                <span className="text-muted">
+                  {formatMinutes(c.minutos)} · {Math.round(c.pct * 100)}%
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {ranking.length > 0 && (
         <section className="flex flex-col gap-3">

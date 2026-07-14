@@ -9,6 +9,8 @@ export interface Project {
   aliases: string[]
   description: string
   status: ProjectStatus
+  /** Categoría libre elegida por ti: Trabajo, Ocio, Cliente X… null = sin categoría. */
+  category: string | null
   createdAt: string
   archived?: boolean
 }
@@ -37,6 +39,7 @@ export interface ReportStats {
   minutosTotales: number
   sesiones: number
   porProyecto: { projectId: string; minutos: number; sesiones: number; entradas: number }[]
+  porCategoria: { categoria: string; minutos: number }[]
   ideasNuevas: number
   pendientesAbiertos: number
   pendientesCerrados: number
@@ -59,18 +62,17 @@ export interface Report {
   writtenToVault?: boolean
 }
 
+/** Sesión en curso. Sin objetivo ni cuenta atrás: empiezas y luego dices cuándo acabó. */
 export interface Timer {
   projectId: string | null
   startedAt: string
-  /** minutos objetivo del pomodoro */
-  target: number
 }
 
 export interface Settings {
   apiKey: string
   theme: 'system' | 'light' | 'dark'
-  pomodoroWork: number
-  pomodoroBreak: number
+  /** Categorías que tú defines: Trabajo, Ocio, Clientes… */
+  categories: string[]
   vaultName: string | null
   onboarded: boolean
 }

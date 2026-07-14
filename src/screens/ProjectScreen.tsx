@@ -1,6 +1,17 @@
 import { useState } from 'react'
 import { ArrowLeft, FileDown, Play, Settings2 } from 'lucide-react'
-import { Button, Empty, Input, Label, Select, Sheet, StatusPill, Textarea } from '../components/ui'
+import {
+  Button,
+  CategorySelect,
+  CategoryTag,
+  Empty,
+  Input,
+  Label,
+  Select,
+  Sheet,
+  StatusPill,
+  Textarea,
+} from '../components/ui'
 import { Capture } from '../components/Capture'
 import { EntryRow } from '../components/EntryRow'
 import { StartSessionSheet } from '../components/TimerBar'
@@ -87,6 +98,7 @@ export function ProjectScreen({ id, go }: { id: string; go: (route: string) => v
 
         <div className="tnum flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted">
           <StatusPill status={project.status} />
+          {project.category && <CategoryTag name={project.category} />}
           <span>·</span>
           <span>
             <strong className="font-semibold text-ink">{formatMinutes(minutesOf(mine))}</strong> invertidos
@@ -236,23 +248,35 @@ function EditSheet({
             onChange={(e) => actions.updateProject(id, { description: e.target.value })}
           />
         </div>
-        <div>
-          <Label htmlFor="e-status">Estado</Label>
-          <Select
-            id="e-status"
-            value={project.status}
-            onChange={(e) => actions.updateProject(id, { status: e.target.value as ProjectStatus })}
-          >
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABEL[s]}
-              </option>
-            ))}
-          </Select>
-          <p className="mt-1.5 text-[12px] leading-relaxed text-muted">
-            Un proyecto personal nunca se termina del todo: por eso «lanzada», no «terminada».
-          </p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="e-cat">Categoría</Label>
+            <CategorySelect
+              id="e-cat"
+              value={project.category}
+              categories={db.settings.categories}
+              onChange={(category) => actions.updateProject(id, { category })}
+              onCreate={actions.addCategory}
+            />
+          </div>
+          <div>
+            <Label htmlFor="e-status">Estado</Label>
+            <Select
+              id="e-status"
+              value={project.status}
+              onChange={(e) => actions.updateProject(id, { status: e.target.value as ProjectStatus })}
+            >
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_LABEL[s]}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
+        <p className="-mt-2 text-[12px] leading-relaxed text-muted">
+          Un proyecto personal nunca se termina del todo: por eso «lanzada», no «terminada».
+        </p>
 
         <div className="flex items-center justify-between border-t border-line pt-4">
           <Button variant="danger" size="sm" onClick={remove}>

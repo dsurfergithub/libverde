@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 import type { EntryKind, ProjectStatus } from '../lib/types'
 import { KIND_LABEL, STATUS_LABEL } from '../lib/types'
@@ -159,6 +159,86 @@ export const Label = ({ children, htmlFor }: { children: ReactNode; htmlFor?: st
   <label htmlFor={htmlFor} className="mb-1.5 block text-[13px] font-medium text-muted">
     {children}
   </label>
+)
+
+// --- Category select (con creación en línea) ------------------------------
+
+const NEW = '__new__'
+
+export function CategorySelect({
+  id,
+  value,
+  categories,
+  onChange,
+  onCreate,
+}: {
+  id: string
+  value: string | null
+  categories: string[]
+  onChange: (value: string | null) => void
+  onCreate: (name: string) => void
+}) {
+  const [creating, setCreating] = useState(false)
+  const [draft, setDraft] = useState('')
+
+  const commit = () => {
+    const clean = draft.trim()
+    if (clean) {
+      onCreate(clean)
+      onChange(clean)
+    }
+    setDraft('')
+    setCreating(false)
+  }
+
+  if (creating) {
+    return (
+      <div className="flex gap-2">
+        <Input
+          id={id}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              commit()
+            }
+            if (e.key === 'Escape') setCreating(false)
+          }}
+          placeholder="Trabajo, Ocio, Cliente…"
+          autoFocus
+        />
+        <Button variant="outline" onClick={commit} disabled={!draft.trim()}>
+          Crear
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <Select
+      id={id}
+      value={value ?? ''}
+      onChange={(e) => {
+        if (e.target.value === NEW) setCreating(true)
+        else onChange(e.target.value || null)
+      }}
+    >
+      <option value="">— Sin categoría —</option>
+      {categories.map((c) => (
+        <option key={c} value={c}>
+          {c}
+        </option>
+      ))}
+      <option value={NEW}>+ Nueva categoría…</option>
+    </Select>
+  )
+}
+
+export const CategoryTag = ({ name }: { name: string }) => (
+  <span className="inline-flex h-5 shrink-0 items-center rounded border border-line px-1.5 text-[11px] font-medium text-muted">
+    {name}
+  </span>
 )
 
 // --- Empty state ----------------------------------------------------------

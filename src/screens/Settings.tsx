@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Download, ExternalLink, FolderOpen, Upload } from 'lucide-react'
+import { Download, ExternalLink, FolderOpen, Plus, Trash2, Upload } from 'lucide-react'
 import { Button, Input, Label, Select } from '../components/ui'
 import { useToast } from '../components/Toast'
 import { actions, exportJSON, useDB } from '../lib/store'
 import { downloadFile, forgetVault, pickVault, vaultSupported } from '../lib/vault'
-import { isoDate } from '../lib/time'
+import { isoDate, plural } from '../lib/time'
 import type { DB } from '../lib/types'
 
 export function Settings() {
@@ -116,31 +116,11 @@ export function Settings() {
         )}
       </Section>
 
-      <Section title="Pomodoro" note="El tiempo se cuenta desde el reloj del sistema: bloquear el móvil no lo detiene.">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label htmlFor="s-work">Trabajo (min)</Label>
-            <Input
-              id="s-work"
-              type="number"
-              min={1}
-              max={180}
-              value={db.settings.pomodoroWork}
-              onChange={(e) => actions.setSettings({ pomodoroWork: Math.max(1, Number(e.target.value) || 25) })}
-            />
-          </div>
-          <div>
-            <Label htmlFor="s-break">Descanso (min)</Label>
-            <Input
-              id="s-break"
-              type="number"
-              min={1}
-              max={60}
-              value={db.settings.pomodoroBreak}
-              onChange={(e) => actions.setSettings({ pomodoroBreak: Math.max(1, Number(e.target.value) || 5) })}
-            />
-          </div>
-        </div>
+      <Section
+        title="Categorías"
+        note="Agrupan tus proyectos en la portada y separan el tiempo en los insights y en la memoria semanal. Borrar una no borra proyectos: los deja sin categoría."
+      >
+        <Categories />
       </Section>
 
       <Section title="Apariencia" note="Por defecto sigue al sistema: oscuro de noche, claro de día.">
@@ -177,6 +157,67 @@ export function Settings() {
           {db.projects.length} proyectos · {db.entries.length} entradas · {db.reports.length} memorias
         </p>
       </Section>
+    </div>
+  )
+}
+
+function Categories() {
+  const db = useDB()
+  const toast = useToast()
+  const [draft, setDraft] = useState('')
+
+  const add = (e: React.FormEvent) => {
+    e.preventDefault()
+    const clean = draft.trim()
+    if (!clean) return
+    actions.addCategory(clean)
+    setDraft('')
+  }
+
+  const count = (name: string) => db.projects.filter((p) => p.category === name).length
+
+  return (
+    <div className="flex flex-col gap-3">
+      {db.settings.categories.length > 0 && (
+        <ul className="rounded-xl border border-line bg-surface">
+          {db.settings.categories.map((c) => (
+            <li key={c} className="flex items-center gap-3 border-b border-line px-3 py-2.5 last:border-0">
+              <input
+                value={c}
+                onChange={(e) => actions.renameCategory(c, e.target.value)}
+                aria-label={`Nombre de la categoría ${c}`}
+                className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[14px] font-medium text-ink focus:outline-none"
+              />
+              <span className="tnum shrink-0 text-[12px] text-muted">
+                {plural(count(c), 'proyecto', 'proyectos')}
+              </span>
+              <button
+                onClick={() => {
+                  actions.deleteCategory(c)
+                  toast(`Categoría «${c}» borrada.`)
+                }}
+                aria-label={`Borrar categoría ${c}`}
+                className="shrink-0 rounded-md p-1 text-muted transition-colors hover:bg-surface-2 hover:text-pendiente"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <form onSubmit={add} className="flex gap-2">
+        <Input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Trabajo, Ocio, Cliente X…"
+          aria-label="Nueva categoría"
+        />
+        <Button variant="outline" type="submit" disabled={!draft.trim()}>
+          <Plus className="size-4" />
+          Añadir
+        </Button>
+      </form>
     </div>
   )
 }

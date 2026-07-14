@@ -13,8 +13,7 @@ const EMPTY: DB = {
   settings: {
     apiKey: '',
     theme: 'system',
-    pomodoroWork: 25,
-    pomodoroBreak: 5,
+    categories: ['Trabajo', 'Ocio'],
     vaultName: null,
     onboarded: false,
   },
@@ -71,7 +70,9 @@ function markStaleReports(db: DB, at: string): Report[] {
 
 export const actions = {
   // ---- proyectos ----
-  addProject(p: Omit<Project, 'id' | 'createdAt'> & Partial<Pick<Project, 'id' | 'createdAt'>>): Project {
+  addProject(
+    p: Omit<Project, 'id' | 'createdAt' | 'category'> & Partial<Pick<Project, 'id' | 'createdAt' | 'category'>>,
+  ): Project {
     const project: Project = {
       id: p.id ?? uid(),
       createdAt: p.createdAt ?? new Date().toISOString(),
@@ -79,6 +80,7 @@ export const actions = {
       aliases: p.aliases ?? [],
       description: p.description ?? '',
       status: p.status ?? 'idea',
+      category: p.category ?? null,
     }
     commit({ ...state, projects: [...state.projects, project] })
     return project
@@ -160,6 +162,35 @@ export const actions = {
   // ---- ajustes ----
   setSettings(patch: Partial<Settings>) {
     commit({ ...state, settings: { ...state.settings, ...patch } })
+  },
+
+  // ---- categorías ----
+  addCategory(name: string) {
+    const clean = name.trim()
+    if (!clean || state.settings.categories.some((c) => c.toLowerCase() === clean.toLowerCase())) return
+    commit({ ...state, settings: { ...state.settings, categories: [...state.settings.categories, clean] } })
+  },
+
+  renameCategory(from: string, to: string) {
+    const clean = to.trim()
+    if (!clean) return
+    commit({
+      ...state,
+      settings: {
+        ...state.settings,
+        categories: state.settings.categories.map((c) => (c === from ? clean : c)),
+      },
+      projects: state.projects.map((p) => (p.category === from ? { ...p, category: clean } : p)),
+    })
+  },
+
+  /** Borrar una categoría no borra proyectos: los deja sin categoría. */
+  deleteCategory(name: string) {
+    commit({
+      ...state,
+      settings: { ...state.settings, categories: state.settings.categories.filter((c) => c !== name) },
+      projects: state.projects.map((p) => (p.category === name ? { ...p, category: null } : p)),
+    })
   },
 
   // ---- copia de seguridad ----

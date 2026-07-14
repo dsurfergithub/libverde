@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import { ChevronRight, Play, Plus } from 'lucide-react'
-import { Button, Empty, Input, Label, Select, Sheet, StatusPill, Textarea } from '../components/ui'
+import {
+  Button,
+  CategorySelect,
+  Empty,
+  Input,
+  Label,
+  Select,
+  Sheet,
+  StatusPill,
+  Textarea,
+} from '../components/ui'
 import { Capture, QueueBanner } from '../components/Capture'
 import { StartSessionSheet } from '../components/TimerBar'
 import { EntryRow } from '../components/EntryRow'
@@ -10,10 +20,12 @@ import { daysSince, formatMinutes, plural } from '../lib/time'
 import { STATUSES, STATUS_LABEL, type ProjectStatus } from '../lib/types'
 
 function NewProjectSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const db = useDB()
   const [name, setName] = useState('')
   const [aliases, setAliases] = useState('')
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState<ProjectStatus>('activo')
+  const [category, setCategory] = useState<string | null>(null)
 
   const create = () => {
     if (!name.trim()) return
@@ -25,10 +37,12 @@ function NewProjectSheet({ open, onClose }: { open: boolean; onClose: () => void
         .filter(Boolean),
       description,
       status,
+      category,
     })
     setName('')
     setAliases('')
     setDescription('')
+    setCategory(null)
     onClose()
   }
 
@@ -68,15 +82,27 @@ function NewProjectSheet({ open, onClose }: { open: boolean; onClose: () => void
             placeholder="Acortador de enlaces con estadísticas"
           />
         </div>
-        <div>
-          <Label htmlFor="n-status">Estado</Label>
-          <Select id="n-status" value={status} onChange={(e) => setStatus(e.target.value as ProjectStatus)}>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABEL[s]}
-              </option>
-            ))}
-          </Select>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="n-cat">Categoría</Label>
+            <CategorySelect
+              id="n-cat"
+              value={category}
+              categories={db.settings.categories}
+              onChange={setCategory}
+              onCreate={actions.addCategory}
+            />
+          </div>
+          <div>
+            <Label htmlFor="n-status">Estado</Label>
+            <Select id="n-status" value={status} onChange={(e) => setStatus(e.target.value as ProjectStatus)}>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_LABEL[s]}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
         <Button variant="primary" onClick={create} disabled={!name.trim()}>
           Crear proyecto
@@ -92,7 +118,7 @@ export function Home({ go }: { go: (route: string) => void }) {
   const [newProject, setNewProject] = useState(false)
   const [session, setSession] = useState(false)
 
-  const projects = db.projects
+  const rows = db.projects
     .filter((p) => !p.archived)
     .map((p) => {
       const mine = db.entries.filter((e) => e.projectId === p.id)
@@ -101,7 +127,13 @@ export function Home({ go }: { go: (route: string) => void }) {
     })
     .sort((a, b) => (b.last ?? '').localeCompare(a.last ?? ''))
 
+  // Agrupadas por categoría, respetando el orden que tú les diste en Ajustes.
+  const groups = [...db.settings.categories, null]
+    .map((cat) => ({ cat, items: rows.filter((r) => r.p.category === cat) }))
+    .filter((g) => g.items.length > 0)
+
   const recent = db.entries.slice(0, 5)
+  const multi = groups.length > 1
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8 px-4 pt-8 pb-28">
@@ -110,10 +142,17 @@ export function Home({ go }: { go: (route: string) => void }) {
         <QueueBanner />
       </section>
 
-      <section aria-label="Resumen" className="grid grid-cols-3 divide-x divide-line rounded-xl border border-line bg-surface">
+      <section
+        aria-label="Resumen"
+        className="grid grid-cols-3 divide-x divide-line rounded-xl border border-line bg-surface"
+      >
         <Stat value={String(stats.activos)} label="proyectos activos" />
         <Stat value={formatMinutes(stats.minutosSemana)} label="esta semana" />
-        <Stat value={String(stats.ideasSinRevisar)} label="ideas sin revisar" tone={stats.ideasSinRevisar > 0 ? 'idea' : undefined} />
+        <Stat
+          value={String(stats.ideasSinRevisar)}
+          label="ideas sin revisar"
+          tone={stats.ideasSinRevisar > 0 ? 'idea' : undefined}
+        />
       </section>
 
       <section className="flex flex-col gap-3">
@@ -131,39 +170,53 @@ export function Home({ go }: { go: (route: string) => void }) {
           </div>
         </div>
 
-        {projects.length === 0 ? (
+        {rows.length === 0 ? (
           <div className="rounded-xl border border-dashed border-line">
             <Empty icon={<Plus className="size-5" />} title="Aún no hay proyectos">
               Registra tus apps primero: sin la lista, la IA no puede saber de cuál estás hablando cuando dictas.
             </Empty>
           </div>
         ) : (
-          <ul className="overflow-hidden rounded-xl border border-line bg-surface">
-            {projects.map(({ p, minutos, dias }) => (
-              <li key={p.id} className="border-b border-line last:border-0">
-                <button
-                  onClick={() => go(`#/p/${p.id}`)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2"
-                >
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[14px] font-medium">{p.name}</span>
-                    <span className="tnum mt-0.5 flex items-center gap-2 text-[12px] text-muted">
-                      <StatusPill status={p.status} />
-                      <span>·</span>
-                      <span>{formatMinutes(minutos)}</span>
-                      {dias !== null && dias >= 14 && (
-                        <>
-                          <span>·</span>
-                          <span className="text-pendiente">{plural(dias, 'día', 'días')} sin tocar</span>
-                        </>
-                      )}
+          <div className="flex flex-col gap-5">
+            {groups.map((g) => (
+              <div key={g.cat ?? '_'} className="flex flex-col gap-1.5">
+                {multi && (
+                  <h3 className="px-1 text-[12px] font-semibold tracking-wide text-muted">
+                    {g.cat ?? 'Sin categoría'}
+                    <span className="tnum ml-1.5 font-normal opacity-70">
+                      {formatMinutes(g.items.reduce((s, r) => s + r.minutos, 0))}
                     </span>
-                  </span>
-                  <ChevronRight className="size-4 shrink-0 text-muted" />
-                </button>
-              </li>
+                  </h3>
+                )}
+                <ul className="overflow-hidden rounded-xl border border-line bg-surface">
+                  {g.items.map(({ p, minutos, dias }) => (
+                    <li key={p.id} className="border-b border-line last:border-0">
+                      <button
+                        onClick={() => go(`#/p/${p.id}`)}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2"
+                      >
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[14px] font-medium">{p.name}</span>
+                          <span className="tnum mt-0.5 flex items-center gap-2 text-[12px] text-muted">
+                            <StatusPill status={p.status} />
+                            <span>·</span>
+                            <span>{formatMinutes(minutos)}</span>
+                            {dias !== null && dias >= 14 && (
+                              <>
+                                <span>·</span>
+                                <span className="text-pendiente">{plural(dias, 'día', 'días')} sin tocar</span>
+                              </>
+                            )}
+                          </span>
+                        </span>
+                        <ChevronRight className="size-4 shrink-0 text-muted" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </section>
 

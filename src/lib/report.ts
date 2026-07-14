@@ -48,6 +48,9 @@ export function composeMarkdown(
     `pendientes_abiertos: ${stats.pendientesAbiertos}`,
     `pendientes_cerrados: ${stats.pendientesCerrados}`,
     `proyectos_tocados: [${touched.map((p) => slug(name(p.projectId))).join(', ')}]`,
+    ...(stats.porCategoria.length
+      ? [`minutos_por_categoria: {${stats.porCategoria.map((c) => `${slug(c.categoria)}: ${c.minutos}`).join(', ')}}`]
+      : []),
     'tags: [libverde/memoria-semanal]',
     '---',
   ].join('\n')
@@ -62,6 +65,14 @@ export function composeMarkdown(
       'proyecto tocado',
       'proyectos tocados',
     )}`,
+    ...(stats.porCategoria.length > 1
+      ? [
+          '',
+          `**Por categoría:** ${stats.porCategoria
+            .map((c) => `${c.categoria} ${formatMinutes(c.minutos)}`)
+            .join(' · ')}`,
+        ]
+      : []),
   ].join('\n')
 
   const sections = touched.map((p) => {
@@ -140,11 +151,12 @@ export function projectNote(db: DB, project: Project): string {
     '---',
     `proyecto: ${project.name}`,
     `estado: ${project.status}`,
+    `categoria: ${project.category ?? 'null'}`,
     `minutos_totales: ${minutesOf(mine)}`,
     `sesiones: ${mine.filter((e) => e.kind === 'sesion').length}`,
     `ultimo_toque: ${last ? last.slice(0, 10) : 'null'}`,
     `actualizado: ${isoDate(new Date())}`,
-    'tags: [libverde/proyecto]',
+    `tags: [libverde/proyecto${project.category ? `, libverde/${slug(project.category)}` : ''}]`,
     '---',
     '',
     `# ${project.name}`,

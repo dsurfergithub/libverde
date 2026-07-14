@@ -40,6 +40,26 @@ export const daysSince = (iso: string) => differenceInCalendarDays(new Date(), n
 
 export const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
 
+/** Valor para un <input type="time">: "09:35". */
+export const timeInputValue = (d: Date | string) =>
+  format(typeof d === 'string' ? new Date(d) : d, 'HH:mm')
+
+/**
+ * Combina el día de `base` con la hora "HH:MM" del input.
+ * Si el resultado cae antes de `base`, se asume que cruzó la medianoche.
+ */
+export function applyTime(base: Date, hhmm: string, allowNextDay = false): Date | null {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm)
+  if (!m) return null
+  const h = Number(m[1])
+  const min = Number(m[2])
+  if (h > 23 || min > 59) return null
+  const d = new Date(base)
+  d.setHours(h, min, 0, 0)
+  if (allowNextDay && d.getTime() < base.getTime()) d.setDate(d.getDate() + 1)
+  return d
+}
+
 export function formatMinutes(min: number): string {
   if (!min) return '0m'
   const h = Math.floor(min / 60)
@@ -57,8 +77,12 @@ export function elapsedSeconds(startedAt: string): number {
   return Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000))
 }
 
+/** mm:ss hasta la hora; a partir de ahí h:mm:ss. Las sesiones pueden ser largas. */
 export function clock(totalSeconds: number): string {
-  const m = Math.floor(totalSeconds / 60)
+  const h = Math.floor(totalSeconds / 3600)
+  const m = Math.floor((totalSeconds % 3600) / 60)
   const s = totalSeconds % 60
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  const mm = String(m).padStart(2, '0')
+  const ss = String(s).padStart(2, '0')
+  return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`
 }

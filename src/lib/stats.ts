@@ -45,10 +45,21 @@ export function computeStats(db: DB, from: Date, to: Date): ReportStats {
 
   const openNow = db.entries.filter((e) => e.kind === 'pendiente' && !e.done)
 
+  const cats = new Map<string, number>()
+  for (const p of porProyecto) {
+    if (!p.minutos) continue
+    const cat = db.projects.find((x) => x.id === p.projectId)?.category ?? 'Sin categoría'
+    cats.set(cat, (cats.get(cat) ?? 0) + p.minutos)
+  }
+  const porCategoria = [...cats.entries()]
+    .map(([categoria, minutos]) => ({ categoria, minutos }))
+    .sort((a, b) => b.minutos - a.minutos)
+
   return {
     minutosTotales: minutesOf(week),
     sesiones: week.filter((e) => e.kind === 'sesion').length,
     porProyecto,
+    porCategoria,
     ideasNuevas: week.filter((e) => e.kind === 'idea').length,
     pendientesAbiertos: openNow.length,
     pendientesCerrados: week.filter((e) => e.kind === 'pendiente' && e.done).length,
@@ -131,7 +142,17 @@ export function insights(db: DB) {
   const totalMin = [...cur.values()].reduce((a, b) => a + b, 0)
   const prevMin = [...prev.values()].reduce((a, b) => a + b, 0)
 
-  return { ranking, stale, ideasStacked, silent, totalMin, prevMin }
+  // Reparto por categoría de los últimos 7 días.
+  const cats = new Map<string, number>()
+  for (const [projectId, minutos] of cur) {
+    const cat = db.projects.find((p) => p.id === projectId)?.category ?? 'Sin categoría'
+    cats.set(cat, (cats.get(cat) ?? 0) + minutos)
+  }
+  const byCategory = [...cats.entries()]
+    .map(([categoria, minutos]) => ({ categoria, minutos, pct: totalMin ? minutos / totalMin : 0 }))
+    .sort((a, b) => b.minutos - a.minutos)
+
+  return { ranking, stale, ideasStacked, silent, totalMin, prevMin, byCategory }
 }
 
 export const projectById = (projects: Project[], id: string | null) =>
