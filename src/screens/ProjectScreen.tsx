@@ -70,7 +70,7 @@ export function ProjectScreen({ id, go }: { id: string; go: (route: string) => v
     <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 pt-4 pb-28">
       <button
         onClick={() => go('#/')}
-        className="flex w-fit items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-ink"
+        className="flex w-fit items-center gap-1.5 text-[14px] text-muted transition-colors hover:text-ink"
       >
         <ArrowLeft className="size-4" />
         Proyectos
@@ -81,7 +81,7 @@ export function ProjectScreen({ id, go }: { id: string; go: (route: string) => v
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold tracking-tight text-balance">{project.name}</h1>
             {project.description && (
-              <p className="mt-1 max-w-[65ch] text-[14px] leading-relaxed text-muted text-pretty">
+              <p className="mt-1 max-w-[65ch] text-[15px] leading-relaxed text-muted text-pretty">
                 {project.description}
               </p>
             )}
@@ -96,7 +96,7 @@ export function ProjectScreen({ id, go }: { id: string; go: (route: string) => v
           </div>
         </div>
 
-        <div className="tnum flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted">
+        <div className="tnum flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted">
           <StatusPill status={project.status} />
           {project.category && <CategoryTag name={project.category} />}
           <span>·</span>
@@ -149,7 +149,7 @@ export function ProjectScreen({ id, go }: { id: string; go: (route: string) => v
                 role="tab"
                 aria-selected={active}
                 onClick={() => setFilter(k)}
-                className={`h-7 rounded-full border px-2.5 text-[12px] font-medium transition-colors ${
+                className={`h-7 rounded-full border px-2.5 text-[13px] font-medium transition-colors ${
                   active
                     ? 'border-primary bg-primary text-primary-ink'
                     : 'border-line text-muted hover:bg-surface-2 hover:text-ink'
@@ -274,7 +274,7 @@ function EditSheet({
             </Select>
           </div>
         </div>
-        <p className="-mt-2 text-[12px] leading-relaxed text-muted">
+        <p className="-mt-2 text-[13px] leading-relaxed text-muted">
           Un proyecto personal nunca se termina del todo: por eso «lanzada», no «terminada».
         </p>
 

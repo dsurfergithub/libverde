@@ -81,7 +81,7 @@ REGLAS
    Si menciona tiempo trabajado, gana "sesion" aunque también cuente avances.
 3. minutes: solo si menciona una duración explícita. Si no, null. Nunca la estimes.
 4. text: la nota limpia, en primera persona, sin muletillas ni titubeos, conservando TODOS los detalles técnicos y nombres propios. No resumas de más ni añadas nada que no haya dicho.
-5. pendientes: frases sueltas de cosas que quedan por hacer y que menciona de pasada ("me falta revisar el export"). Cada una corta y accionable. Si no hay, array vacío.
+5. pendientes: SOLO tareas ADICIONALES que menciona de pasada, DISTINTAS del contenido principal de la nota. NUNCA repitas ni parafrasees aquí lo que ya está en text: si la nota entera es una sola tarea (kind "pendiente"), pendientes es []. Si la nota es una idea o un avance sin tareas extra, pendientes es []. Cada elemento corto y accionable. En caso de duda, array vacío: es mil veces peor duplicar una nota que omitir un pendiente.
 6. transcript: la transcripción literal de lo que ha dicho.
 
 No inventes contenido. Si la nota es confusa, transcríbela tal cual y usa kind "nota".`
@@ -100,20 +100,60 @@ const CAPTURE_SCHEMA = (projects: Project[]) => ({
   propertyOrdering: ['transcript', 'projectId', 'kind', 'text', 'minutes', 'pendientes'],
 })
 
+/** Para comparar frases: minúsculas, sin acentos, sin puntuación, espacios colapsados. */
+const canon = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+/**
+ * El modelo tiende a repetir la nota principal dentro de `pendientes` aunque
+ * el prompt se lo prohíba. Cada pendiente que duplica (o casi) el text
+ * principal se descarta aquí: era la causa de que una nota se guardara doble.
+ */
+function dedupePendientes(pendientes: string[], text: string, kind: EntryKind): string[] {
+  const main = canon(text)
+  const seen = new Set<string>()
+  return pendientes.filter((p) => {
+    const c = canon(p)
+    if (!c || seen.has(c)) return false
+    if (c === main) return false
+    // Una contiene a la otra y son de tamaño parecido → es la misma frase.
+    if (
+      (main.includes(c) || c.includes(main)) &&
+      Math.min(c.length, main.length) / Math.max(c.length, main.length) >= 0.5
+    )
+      return false
+    // Si la nota principal YA es un pendiente, cualquier solape la duplica.
+    if (kind === 'pendiente' && (main.includes(c) || c.includes(main))) return false
+    seen.add(c)
+    return true
+  })
+}
+
 function normalize(parsed: Record<string, unknown>, projects: Project[]): CaptureResult {
   const rawId = typeof parsed.projectId === 'string' ? parsed.projectId : UNKNOWN
   const projectId = projects.some((p) => p.id === rawId) ? rawId : null
   const minutes = typeof parsed.minutes === 'number' && parsed.minutes > 0 ? Math.round(parsed.minutes) : null
+  const kind = (['nota', 'idea', 'avance', 'pendiente', 'sesion'] as EntryKind[]).includes(
+    parsed.kind as EntryKind,
+  )
+    ? (parsed.kind as EntryKind)
+    : 'nota'
+  const text = String(parsed.text ?? '').trim()
+  const rawPendientes = Array.isArray(parsed.pendientes)
+    ? parsed.pendientes.map(String).map((s) => s.trim()).filter(Boolean)
+    : []
   return {
     projectId,
-    kind: (['nota', 'idea', 'avance', 'pendiente', 'sesion'] as EntryKind[]).includes(parsed.kind as EntryKind)
-      ? (parsed.kind as EntryKind)
-      : 'nota',
-    text: String(parsed.text ?? '').trim(),
+    kind,
+    text,
     minutes,
-    pendientes: Array.isArray(parsed.pendientes)
-      ? parsed.pendientes.map(String).map((s) => s.trim()).filter(Boolean)
-      : [],
+    pendientes: dedupePendientes(rawPendientes, text, kind),
     transcript: String(parsed.transcript ?? '').trim(),
   }
 }

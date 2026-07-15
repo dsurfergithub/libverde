@@ -82,7 +82,7 @@ export function WeekScreen() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Cierre de semana</h1>
-          <p className="tnum mt-0.5 text-[13px] text-muted">
+          <p className="tnum mt-0.5 text-[14px] text-muted">
             {weekKey} · {weekLabel(from, to)}
           </p>
         </div>
@@ -118,8 +118,8 @@ export function WeekScreen() {
       {ideas.length > 0 && (
         <section className="flex flex-col gap-3">
           <div>
-            <h2 className="text-[15px] font-semibold">1 · Repasa tus ideas</h2>
-            <p className="mt-0.5 text-[13px] leading-relaxed text-muted">
+            <h2 className="text-[16px] font-semibold">1 · Repasa tus ideas</h2>
+            <p className="mt-0.5 text-[14px] leading-relaxed text-muted">
               {ideas.length} sin revisar. Mátalas o conviértelas en pendientes: una idea que nunca se decide es
               solo un número que crece.
             </p>
@@ -133,8 +133,8 @@ export function WeekScreen() {
                   className="flex items-center gap-3 border-b border-line px-4 py-3 last:border-0"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-[14px] leading-snug">{e.text}</p>
-                    <p className="mt-0.5 text-[12px] text-muted">{project?.name ?? 'Sin proyecto'}</p>
+                    <p className="text-[15px] leading-snug">{e.text}</p>
+                    <p className="mt-0.5 text-[13px] text-muted">{project?.name ?? 'Sin proyecto'}</p>
                   </div>
                   <div className="flex shrink-0 gap-1.5">
                     <Button
@@ -167,8 +167,8 @@ export function WeekScreen() {
       <section className="flex flex-col gap-3">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-[15px] font-semibold">{ideas.length > 0 ? '2 · ' : ''}La memoria</h2>
-            <p className="mt-0.5 text-[13px] leading-relaxed text-muted">
+            <h2 className="text-[16px] font-semibold">{ideas.length > 0 ? '2 · ' : ''}La memoria</h2>
+            <p className="mt-0.5 text-[14px] leading-relaxed text-muted">
               Markdown con frontmatter y wikilinks. Escrito para Obsidian y para Claude, no para lucir.
             </p>
           </div>
@@ -181,7 +181,7 @@ export function WeekScreen() {
         </div>
 
         {report?.stale && (
-          <p className="rounded-lg border border-idea/40 bg-idea-soft px-3 py-2 text-[13px] leading-snug text-idea">
+          <p className="rounded-lg border border-idea/40 bg-idea-soft px-3 py-2 text-[14px] leading-snug text-idea">
             Han entrado datos nuevos de esta semana después de generarla. Regenera si quieres incluirlos — la
             memoria no se reescribe sola.
           </p>
@@ -250,7 +250,7 @@ export function WeekScreen() {
             </div>
 
             {report.closed && (
-              <p className="text-[12px] leading-relaxed text-muted">
+              <p className="text-[13px] leading-relaxed text-muted">
                 Cerrada y congelada. Lo que ya entregaste no se reescribe solo.
               </p>
             )}
@@ -260,14 +260,14 @@ export function WeekScreen() {
 
       {stats.sinActividad.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-[15px] font-semibold">Sin actividad</h2>
+          <h2 className="text-[16px] font-semibold">Sin actividad</h2>
           <ul className="tnum rounded-xl border border-line bg-surface px-4">
             {stats.sinActividad.slice(0, 6).map((s) => {
               const p = db.projects.find((x) => x.id === s.projectId)
               return (
                 <li
                   key={s.projectId}
-                  className="flex items-center justify-between gap-3 border-b border-line py-2.5 text-[13px] last:border-0"
+                  className="flex items-center justify-between gap-3 border-b border-line py-2.5 text-[14px] last:border-0"
                 >
                   <span className="truncate">{p?.name}</span>
                   <span className="shrink-0 text-muted">
@@ -288,8 +288,8 @@ export function WeekScreen() {
 function Cell({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-center gap-0.5 px-1 py-3">
-      <span className="text-[15px] font-semibold">{value}</span>
-      <span className="text-[11px] text-muted">{label}</span>
+      <span className="text-[16px] font-semibold">{value}</span>
+      <span className="text-[12px] text-muted">{label}</span>
     </div>
   )
 }

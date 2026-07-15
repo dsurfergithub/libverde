@@ -16,6 +16,7 @@ const EMPTY: DB = {
     categories: ['Trabajo', 'Ocio'],
     vaultName: null,
     onboarded: false,
+    sounds: true,
   },
 }
 
@@ -103,6 +104,17 @@ export const actions = {
 
   // ---- entradas ----
   addEntry(e: Omit<Entry, 'id'> & Partial<Pick<Entry, 'id'>>): Entry {
+    // Guardarraíl anti-duplicados: iOS a veces dispara el toque dos veces
+    // (ghost click) y una nota no puede guardarse doble jamás.
+    const dup = state.entries.find(
+      (x) =>
+        x.text === e.text.trim() &&
+        x.kind === e.kind &&
+        (x.projectId ?? null) === (e.projectId ?? null) &&
+        Math.abs(Date.parse(x.at) - Date.parse(e.at)) < 5000,
+    )
+    if (dup) return dup
+
     const entry: Entry = { ...e, id: e.id ?? uid() }
     commit({
       ...state,

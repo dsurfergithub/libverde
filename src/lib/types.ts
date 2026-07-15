@@ -75,6 +75,8 @@ export interface Settings {
   categories: string[]
   vaultName: string | null
   onboarded: boolean
+  /** Sonidos de interfaz (grabar, guardar, error). */
+  sounds: boolean
 }
 
 export interface QueuedCapture {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Download, ExternalLink, FolderOpen, Plus, Trash2, Upload } from 'lucide-react'
-import { Button, Input, Label, Select } from '../components/ui'
+import { Button, Input, Label, Select, Toggle } from '../components/ui'
 import { useToast } from '../components/Toast'
 import { actions, exportJSON, useDB } from '../lib/store'
 import { downloadFile, forgetVault, pickVault, vaultSupported } from '../lib/vault'
@@ -79,11 +79,11 @@ export function Settings() {
             href="https://aistudio.google.com/apikey"
             target="_blank"
             rel="noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-[12px] text-muted underline transition-colors hover:text-ink"
+            className="mt-2 inline-flex items-center gap-1 text-[13px] text-muted underline transition-colors hover:text-ink"
           >
             Consíguela en Google AI Studio <ExternalLink className="size-3" />
           </a>
-          <p className="mt-2 text-[12px] leading-relaxed text-muted">
+          <p className="mt-2 text-[13px] leading-relaxed text-muted">
             Sin key la app funciona entera: escribes las notas a mano, los audios se encolan y la memoria se
             genera con tus entradas literales en vez de redactada.
           </p>
@@ -95,13 +95,13 @@ export function Settings() {
         note="Eliges la carpeta una vez y LibVerde escribe ahí Semanas/ y Proyectos/. Solo Chrome y Edge de escritorio."
       >
         {!vaultSupported() ? (
-          <p className="text-[13px] leading-relaxed text-muted">
+          <p className="text-[14px] leading-relaxed text-muted">
             Este navegador no permite escribir en carpetas. En el móvil usa «Copiar» o «Descargar .md» desde el
             cierre de semana; conecta el vault desde el escritorio.
           </p>
         ) : db.settings.vaultName ? (
           <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-3 py-2.5">
-            <span className="truncate text-[13px]">
+            <span className="truncate text-[14px]">
               Conectado a <strong className="font-medium">{db.settings.vaultName}</strong>
             </span>
             <Button size="sm" variant="ghost" onClick={disconnect}>
@@ -136,6 +136,19 @@ export function Settings() {
             <option value="dark">Oscuro</option>
           </Select>
         </div>
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface px-3.5 py-3">
+          <div className="min-w-0">
+            <p className="text-[15px] font-medium">Sonidos</p>
+            <p className="mt-0.5 text-[13px] leading-snug text-muted">
+              Toques sutiles al grabar, guardar y completar.
+            </p>
+          </div>
+          <Toggle
+            label="Sonidos de interfaz"
+            checked={db.settings.sounds !== false}
+            onChange={(v) => actions.setSettings({ sounds: v })}
+          />
+        </div>
       </Section>
 
       <Section title="Copia de seguridad" note="Todo vive en este dispositivo. Si borras el navegador, se va. Exporta de vez en cuando.">
@@ -153,7 +166,7 @@ export function Settings() {
           </Button>
           <input ref={file} type="file" accept="application/json" onChange={importJSON} className="hidden" />
         </div>
-        <p className="tnum mt-2 text-[12px] text-muted">
+        <p className="tnum mt-2 text-[13px] text-muted">
           {db.projects.length} proyectos · {db.entries.length} entradas · {db.reports.length} memorias
         </p>
       </Section>
@@ -186,9 +199,9 @@ function Categories() {
                 value={c}
                 onChange={(e) => actions.renameCategory(c, e.target.value)}
                 aria-label={`Nombre de la categoría ${c}`}
-                className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[14px] font-medium text-ink focus:outline-none"
+                className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[15px] font-medium text-ink focus:outline-none"
               />
-              <span className="tnum shrink-0 text-[12px] text-muted">
+              <span className="tnum shrink-0 text-[13px] text-muted">
                 {plural(count(c), 'proyecto', 'proyectos')}
               </span>
               <button
@@ -226,8 +239,8 @@ function Section({ title, note, children }: { title: string; note: string; child
   return (
     <section className="flex flex-col gap-3">
       <div>
-        <h2 className="text-[15px] font-semibold">{title}</h2>
-        <p className="mt-0.5 max-w-[65ch] text-[13px] leading-relaxed text-muted text-pretty">{note}</p>
+        <h2 className="text-[16px] font-semibold">{title}</h2>
+        <p className="mt-0.5 max-w-[65ch] text-[14px] leading-relaxed text-muted text-pretty">{note}</p>
       </div>
       {children}
     </section>

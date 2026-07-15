@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { BarChart3, CalendarCheck, Home as HomeIcon, Settings as SettingsIcon } from 'lucide-react'
 import { ToastProvider } from './components/Toast'
 import { TimerBar } from './components/TimerBar'
+import { sfx } from './lib/sound'
 import { Home } from './screens/Home'
 import { ProjectScreen } from './screens/ProjectScreen'
 import { Insights } from './screens/Insights'
@@ -73,13 +74,19 @@ export default function App() {
 
   return (
     <ToastProvider>
-      <div className="flex min-h-full flex-col">
+      {/* Velo del notch: en PWA a pantalla completa el contenido pasa por
+          detrás del reloj de iOS; este velo lo difumina como una barra nativa. */}
+      <div
+        aria-hidden
+        className="fixed inset-x-0 top-0 z-30 h-[env(safe-area-inset-top)] bg-bg/80 backdrop-blur-md"
+      />
+      <div className="safe-top flex min-h-full flex-col">
         <TimerBar />
         <main className="flex-1">{screen}</main>
 
         <nav
           aria-label="Navegación principal"
-          className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 backdrop-blur"
+          className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
         >
           <ul className="mx-auto flex max-w-2xl">
             {TABS.map(({ route, label, icon: Icon }) => {
@@ -87,13 +94,16 @@ export default function App() {
               return (
                 <li key={route} className="flex-1">
                   <button
-                    onClick={() => go(route)}
+                    onClick={() => {
+                      if (!active) sfx.tap()
+                      go(route)
+                    }}
                     aria-current={active ? 'page' : undefined}
-                    className={`flex w-full flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors ${
+                    className={`pressable flex w-full flex-col items-center gap-1 pt-2.5 pb-2 text-[11px] font-medium ${
                       active ? 'text-primary' : 'text-muted hover:text-ink'
                     }`}
                   >
-                    <Icon className="size-[18px]" strokeWidth={active ? 2.4 : 2} />
+                    <Icon className="size-5" strokeWidth={active ? 2.4 : 2} />
                     {label}
                   </button>
                 </li>

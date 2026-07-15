@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Check, Loader2, Mic, Square, Trash2, WifiOff } from 'lucide-react'
+import { sfx } from '../lib/sound'
 import { Button, Input, KindBadge, Label, Select, Sheet, Textarea } from './ui'
 import { useToast } from './Toast'
 import { actions, uid, useDB } from '../lib/store'
@@ -34,12 +35,17 @@ function ConfirmSheet({
   const [text, setText] = useState(draft.text)
   const [minutes, setMinutes] = useState(draft.minutes?.toString() ?? '')
   const [pendientes, setPendientes] = useState(draft.pendientes)
+  // Un toque = un guardado. iOS puede repetir el click (ghost click) y esta
+  // tarjeta no puede generar dos entradas jamás.
+  const saved = useRef(false)
 
   const save = () => {
+    if (saved.current) return
     if (!text.trim()) {
       toast('La nota está vacía.', 'error')
       return
     }
+    saved.current = true
     const at = new Date().toISOString()
     const pid = projectId || null
 
@@ -89,12 +95,12 @@ function ConfirmSheet({
         <div className="flex flex-wrap items-center gap-1.5">
           <KindBadge kind={kind} />
           {!draft.projectId && (
-            <span className="rounded bg-pendiente-soft px-1.5 py-0.5 text-[11px] font-medium text-pendiente">
+            <span className="rounded bg-pendiente-soft px-1.5 py-0.5 text-[12px] font-medium text-pendiente">
               No sé de qué proyecto es
             </span>
           )}
           {guessed && (
-            <span className="text-[11px] text-muted">
+            <span className="text-[12px] text-muted">
               Lo he asignado yo — corrígeme si me he equivocado
             </span>
           )}
@@ -153,7 +159,7 @@ function ConfirmSheet({
               {pendientes.map((p, i) => (
                 <li
                   key={i}
-                  className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-[13px]"
+                  className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-[14px]"
                 >
                   <span className="flex-1 leading-snug">{p}</span>
                   <button
@@ -170,7 +176,7 @@ function ConfirmSheet({
         )}
 
         {draft.transcript && draft.transcript !== text && (
-          <details className="text-[12px] text-muted">
+          <details className="text-[13px] text-muted">
             <summary className="cursor-pointer select-none">Ver transcripción literal</summary>
             <p className="mt-1.5 rounded-lg bg-surface-2 p-2.5 font-mono leading-relaxed">{draft.transcript}</p>
           </details>
@@ -243,10 +249,12 @@ export function Capture({ presetProjectId }: { presetProjectId?: string }) {
 
   const toggle = async () => {
     if (rec.recording) {
+      sfx.recStop()
       const blob = await rec.stop()
       if (blob) await process(blob)
       return
     }
+    sfx.recStart()
     await rec.start()
   }
 
@@ -323,7 +331,7 @@ export function Capture({ presetProjectId }: { presetProjectId?: string }) {
           </button>
         </div>
 
-        <p className="tnum h-5 text-[13px] font-medium text-muted">
+        <p className="tnum h-5 text-[14px] font-medium text-muted">
           {busy
             ? 'Transcribiendo y clasificando…'
             : rec.recording
@@ -347,7 +355,7 @@ export function Capture({ presetProjectId }: { presetProjectId?: string }) {
         </form>
 
         {!online && (
-          <p className="flex items-center gap-1.5 text-[12px] text-muted">
+          <p className="flex items-center gap-1.5 text-[13px] text-muted">
             <WifiOff className="size-3.5" /> Sin conexión — se encolará
           </p>
         )}
@@ -430,7 +438,7 @@ export function QueueBanner() {
 
   return (
     <div className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-2.5">
-      <span className="flex-1 text-[13px] leading-snug">
+      <span className="flex-1 text-[14px] leading-snug">
         <strong className="font-semibold">{db.queue.length}</strong> audio(s) sin procesar
         {!db.settings.apiKey && <span className="text-muted"> · añade tu API key en Ajustes</span>}
       </span>

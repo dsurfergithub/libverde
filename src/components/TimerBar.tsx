@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Play, Square } from 'lucide-react'
 import { Button, Input, Label, Select, Sheet } from './ui'
+import { sfx } from '../lib/sound'
 import { useToast } from './Toast'
 import { actions, useDB } from '../lib/store'
 import { applyTime, clock, dayLabel, elapsedSeconds, formatMinutes, timeInputValue } from '../lib/time'
@@ -22,6 +23,7 @@ export function StartSessionSheet({
   }, [open, presetProjectId, db.projects])
 
   const start = () => {
+    sfx.sessionStart()
     actions.startTimer({ projectId: projectId || null, startedAt: new Date().toISOString() })
     onClose()
   }
@@ -42,7 +44,7 @@ export function StartSessionSheet({
               ))}
           </Select>
         </div>
-        <p className="text-[13px] leading-relaxed text-muted text-pretty">
+        <p className="text-[14px] leading-relaxed text-muted text-pretty">
           Sin cuenta atrás. Empiezas ahora y, cuando termines, eliges la hora de fin — así puedes cerrarla más
           tarde aunque se te haya olvidado darle a parar.
         </p>
@@ -68,9 +70,11 @@ function EndSessionSheet({ open, onClose }: { open: boolean; onClose: () => void
   const [endTime, setEndTime] = useState('')
   const [projectId, setProjectId] = useState('')
   const [note, setNote] = useState('')
+  const saved = useRef(false)
 
   useEffect(() => {
     if (!open || !timer) return
+    saved.current = false
     setStartTime(timeInputValue(timer.startedAt))
     setEndTime(timeInputValue(new Date()))
     setProjectId(timer.projectId ?? '')
@@ -95,7 +99,9 @@ function EndSessionSheet({ open, onClose }: { open: boolean; onClose: () => void
   const project = db.projects.find((p) => p.id === projectId)
 
   const save = () => {
+    if (saved.current) return
     if (error || !start || !end) return
+    saved.current = true
     actions.addEntry({
       at: end.toISOString(),
       projectId: projectId || null,
@@ -119,7 +125,7 @@ function EndSessionSheet({ open, onClose }: { open: boolean; onClose: () => void
   return (
     <Sheet open={open} onClose={onClose} title="Terminar sesión">
       <div className="flex flex-col gap-4">
-        <p className="text-[13px] text-muted">{dayLabel(timer.startedAt)}</p>
+        <p className="text-[14px] text-muted">{dayLabel(timer.startedAt)}</p>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -138,12 +144,12 @@ function EndSessionSheet({ open, onClose }: { open: boolean; onClose: () => void
           }`}
         >
           {error ? (
-            <p className="text-[13px] font-medium text-pendiente">{error}</p>
+            <p className="text-[14px] font-medium text-pendiente">{error}</p>
           ) : (
-            <p className="tnum text-[15px] font-semibold">
+            <p className="tnum text-[16px] font-semibold">
               {formatMinutes(minutes)}
               {end && end.getDate() !== base.getDate() && (
-                <span className="ml-1.5 text-[12px] font-normal text-muted">(cruza medianoche)</span>
+                <span className="ml-1.5 text-[13px] font-normal text-muted">(cruza medianoche)</span>
               )}
             </p>
           )}
@@ -206,14 +212,14 @@ export function TimerBar() {
 
   return (
     <>
-      <div className="sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur">
+      <div className="sticky top-[env(safe-area-inset-top)] z-20 border-b border-line bg-surface/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-2.5">
           <span className="relative flex size-2 shrink-0">
             <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
             <span className="relative inline-flex size-2 rounded-full bg-primary" />
           </span>
-          <span className="tnum text-[15px] font-semibold">{clock(elapsedSeconds(timer.startedAt))}</span>
-          <span className="min-w-0 flex-1 truncate text-[13px] text-muted">
+          <span className="tnum text-[16px] font-semibold">{clock(elapsedSeconds(timer.startedAt))}</span>
+          <span className="min-w-0 flex-1 truncate text-[14px] text-muted">
             {project?.name ?? 'Sin proyecto'} · desde las {timeInputValue(timer.startedAt)}
           </span>
           <Button size="sm" variant="outline" onClick={() => setEnding(true)}>

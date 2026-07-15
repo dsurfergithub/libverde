@@ -34,6 +34,13 @@
   --radius-card: 14px;
 
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  /* Muelle amortiguado (damping ~0.85, response ~0.35): el sheet llega como material, no como fundido. */
+  --spring: linear(
+    0, 0.0134 1.5%, 0.0525 3.1%, 0.1935 6.5%, 0.4327 11%, 0.6512 15.1%, 0.8115 18.9%,
+    0.9245 22.7%, 0.9954 26.7%, 1.0313 30.9%, 1.0439 35.6%, 1.0405 41.1%, 1.0146 53.9%,
+    1.0016 65.7%, 0.998 79.2%, 1
+  );
+  --spring-soft: linear(0, 0.1382 3.5%, 0.4964 9.9%, 0.7818 16.2%, 0.9345 22.6%, 1.0013 29.7%, 1.0198 39%, 1.0121 52.5%, 1.0015 72.5%, 1);
 
   --z-sticky: 20;
   --z-sheet-backdrop: 40;
@@ -138,6 +145,12 @@ body,
   height: 100%;
 }
 
+html {
+  /* iOS: sin reescalados de texto al rotar y sin zoom raro heredado. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -147,6 +160,38 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overscroll-behavior-y: none;
+  /* El flash gris de iOS al tocar delata que es una web. Fuera. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Sin retardo de doble toque: la respuesta al dedo es inmediata. */
+button,
+a,
+input,
+select,
+textarea,
+[role='button'],
+[role='switch'] {
+  touch-action: manipulation;
+}
+
+/* iOS dibuja sombras/biseles propios en los controles nativos. */
+input:not([type='checkbox']):not([type='radio']),
+textarea,
+select {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+/* No se selecciona texto por accidente al mantener pulsado un control. */
+button,
+[role='button'] {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Foco visible y consistente en toda la app */
@@ -168,16 +213,25 @@ textarea::placeholder {
   .safe-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  /* Botón que responde al dedo en el pointer-down, no al soltar. */
+  .pressable {
+    transition: transform 120ms var(--ease-out-quart), opacity 150ms, background-color 150ms, color 150ms;
+  }
+  .pressable:active {
+    transform: scale(0.965);
+    transition-duration: 60ms;
+  }
 }
 
 @keyframes sheet-in {
   from {
-    transform: translateY(12px);
-    opacity: 0;
+    transform: translateY(100%);
   }
   to {
     transform: translateY(0);
-    opacity: 1;
   }
 }
 
@@ -187,6 +241,28 @@ textarea::placeholder {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes entry-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -202,10 +278,21 @@ textarea::placeholder {
 }
 
 .animate-sheet-in {
-  animation: sheet-in 260ms var(--ease-out-quart);
+  animation: sheet-in 440ms var(--spring);
+}
+@supports not (animation-timing-function: linear(0, 1)) {
+  .animate-sheet-in {
+    animation: sheet-in 300ms var(--ease-out-quart);
+  }
 }
 .animate-fade-in {
   animation: fade-in 180ms var(--ease-out-quart);
+}
+.animate-entry-in {
+  animation: entry-in 380ms var(--spring-soft);
+}
+.animate-toast-in {
+  animation: toast-in 400ms var(--spring);
 }
 .animate-pulse-ring {
   animation: pulse-ring 1600ms var(--ease-out-quart) infinite;
@@ -220,10 +307,15 @@ textarea::placeholder {
     transition-duration: 0.01ms !important;
   }
   .animate-sheet-in,
-  .animate-fade-in {
+  .animate-fade-in,
+  .animate-entry-in,
+  .animate-toast-in {
     animation: fade-in 1ms linear;
   }
   .animate-pulse-ring {
     display: none;
+  }
+  .pressable:active {
+    transform: none;
   }
 }

@@ -33,14 +33,14 @@ export function Insights() {
     <div className="mx-auto flex max-w-2xl flex-col gap-8 px-4 pt-6 pb-28">
       <header>
         <h1 className="text-xl font-semibold tracking-tight">Insights</h1>
-        <p className="mt-0.5 text-[13px] leading-relaxed text-muted">
+        <p className="mt-0.5 text-[14px] leading-relaxed text-muted">
           Últimos 7 días. Números, no adivinación.
         </p>
       </header>
 
       {byCategory.length > 1 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-[15px] font-semibold">En qué se te va la semana</h2>
+          <h2 className="text-[16px] font-semibold">En qué se te va la semana</h2>
           <div className="flex h-2.5 overflow-hidden rounded-full bg-surface-2">
             {byCategory.map((c, i) => (
               <div
@@ -51,7 +51,7 @@ export function Insights() {
               />
             ))}
           </div>
-          <ul className="tnum flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
+          <ul className="tnum flex flex-wrap gap-x-4 gap-y-1 text-[14px]">
             {byCategory.map((c, i) => (
               <li key={c.categoria} className="flex items-center gap-1.5">
                 <span
@@ -72,8 +72,8 @@ export function Insights() {
       {ranking.length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex items-baseline justify-between">
-            <h2 className="text-[15px] font-semibold">Dónde va tu tiempo</h2>
-            <span className="tnum text-[13px] text-muted">
+            <h2 className="text-[16px] font-semibold">Dónde va tu tiempo</h2>
+            <span className="tnum text-[14px] text-muted">
               {formatMinutes(totalMin)}
               {prevMin > 0 && (
                 <span className={delta >= 0 ? 'text-primary' : 'text-pendiente'}>
@@ -88,7 +88,7 @@ export function Insights() {
           <ul className="flex flex-col gap-2.5">
             {ranking.map((r) => (
               <li key={r.projectId} className="flex flex-col gap-1.5">
-                <div className="tnum flex items-baseline justify-between text-[13px]">
+                <div className="tnum flex items-baseline justify-between text-[14px]">
                   <span className="truncate font-medium">{project(r.projectId)}</span>
                   <span className="shrink-0 text-muted">{formatMinutes(r.minutos)}</span>
                 </div>
@@ -103,7 +103,7 @@ export function Insights() {
           </ul>
 
           {top && (
-            <p className="text-[13px] leading-relaxed text-muted text-pretty">
+            <p className="text-[14px] leading-relaxed text-muted text-pretty">
               Esta semana <strong className="font-medium text-ink">{project(top.projectId)}</strong> concentra la
               mayor parte de tu tiempo: {formatMinutes(top.minutos)}.
             </p>
@@ -173,8 +173,8 @@ function Insight({
   return (
     <section className="flex flex-col gap-2">
       <div>
-        <h2 className={`text-[15px] font-semibold ${color}`}>{title}</h2>
-        <p className="mt-0.5 text-[13px] leading-relaxed text-muted text-pretty">{note}</p>
+        <h2 className={`text-[16px] font-semibold ${color}`}>{title}</h2>
+        <p className="mt-0.5 text-[14px] leading-relaxed text-muted text-pretty">{note}</p>
       </div>
       <ul className="tnum rounded-xl border border-line bg-surface px-4">{children}</ul>
     </section>
@@ -182,7 +182,7 @@ function Insight({
 }
 
 const Row = ({ left, right }: { left: string; right: string }) => (
-  <li className="flex items-center justify-between gap-3 border-b border-line py-2.5 text-[13px] last:border-0">
+  <li className="flex items-center justify-between gap-3 border-b border-line py-2.5 text-[14px] last:border-0">
     <span className="truncate">{left}</span>
     <span className="shrink-0 text-muted">{right}</span>
   </li>

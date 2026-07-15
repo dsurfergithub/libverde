@@ -67,7 +67,7 @@ function NewProjectSheet({ open, onClose }: { open: boolean; onClose: () => void
             onChange={(e) => setAliases(e.target.value)}
             placeholder="has back, hash back"
           />
-          <p className="mt-1.5 text-[12px] leading-relaxed text-muted">
+          <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
             Separados por comas. Es lo que evita que la transcripción destroce el nombre y la nota acabe en el
             proyecto equivocado.
           </p>
@@ -157,7 +157,7 @@ export function Home({ go }: { go: (route: string) => void }) {
 
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold">Proyectos</h2>
+          <h2 className="text-[16px] font-semibold">Proyectos</h2>
           <div className="flex gap-1.5">
             <Button size="sm" variant="ghost" onClick={() => setSession(true)}>
               <Play className="size-3.5" />
@@ -181,7 +181,7 @@ export function Home({ go }: { go: (route: string) => void }) {
             {groups.map((g) => (
               <div key={g.cat ?? '_'} className="flex flex-col gap-1.5">
                 {multi && (
-                  <h3 className="px-1 text-[12px] font-semibold tracking-wide text-muted">
+                  <h3 className="px-1 text-[13px] font-semibold tracking-wide text-muted">
                     {g.cat ?? 'Sin categoría'}
                     <span className="tnum ml-1.5 font-normal opacity-70">
                       {formatMinutes(g.items.reduce((s, r) => s + r.minutos, 0))}
@@ -196,8 +196,8 @@ export function Home({ go }: { go: (route: string) => void }) {
                         className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2"
                       >
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[14px] font-medium">{p.name}</span>
-                          <span className="tnum mt-0.5 flex items-center gap-2 text-[12px] text-muted">
+                          <span className="block truncate text-[15px] font-medium">{p.name}</span>
+                          <span className="tnum mt-0.5 flex items-center gap-2 text-[13px] text-muted">
                             <StatusPill status={p.status} />
                             <span>·</span>
                             <span>{formatMinutes(minutos)}</span>
@@ -222,7 +222,7 @@ export function Home({ go }: { go: (route: string) => void }) {
 
       {recent.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-[15px] font-semibold">Últimas entradas</h2>
+          <h2 className="text-[16px] font-semibold">Últimas entradas</h2>
           <ul className="rounded-xl border border-line bg-surface px-4">
             {recent.map((e) => (
               <EntryRow key={e.id} entry={e} showProject />
@@ -241,7 +241,7 @@ function Stat({ value, label, tone }: { value: string; label: string; tone?: 'id
   return (
     <div className="flex flex-col items-center gap-0.5 px-2 py-3.5">
       <span className={`tnum text-xl font-semibold ${tone === 'idea' ? 'text-idea' : 'text-ink'}`}>{value}</span>
-      <span className="text-center text-[12px] leading-tight text-muted">{label}</span>
+      <span className="text-center text-[13px] leading-tight text-muted">{label}</span>
     </div>
   )
 }

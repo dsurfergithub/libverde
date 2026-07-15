@@ -37,7 +37,7 @@ export function Onboarding({ done }: { done: () => void }) {
     <div className="mx-auto flex min-h-full max-w-lg flex-col justify-center gap-8 px-5 py-12">
       <header>
         <h1 className="text-3xl font-semibold tracking-tight text-balance">LibVerde</h1>
-        <p className="mt-2 text-[15px] leading-relaxed text-muted text-pretty">
+        <p className="mt-2 text-[16px] leading-relaxed text-muted text-pretty">
           Dictas lo que has hecho. Ella lo ordena, mide tus sesiones y el domingo te escribe la memoria de la
           semana en Markdown.
         </p>
@@ -51,10 +51,10 @@ export function Onboarding({ done }: { done: () => void }) {
           value={list}
           onChange={(e) => setList(e.target.value)}
           placeholder={'Hashback — acortador de enlaces\nRandomblocker\nBuscador Pro'}
-          className="font-mono text-[13px]"
+          className="font-mono text-[14px]"
           autoFocus
         />
-        <p className="text-[12px] leading-relaxed text-muted text-pretty">
+        <p className="text-[13px] leading-relaxed text-muted text-pretty">
           Uno por línea. Puedes añadir la descripción tras un guion. Esta lista es el vocabulario que la IA usa
           para asignar cada nota a su proyecto — sin ella, todo cae en «sin asignar».
         </p>
@@ -70,7 +70,7 @@ export function Onboarding({ done }: { done: () => void }) {
           placeholder="AIza…"
           autoComplete="off"
         />
-        <p className="text-[12px] leading-relaxed text-muted text-pretty">
+        <p className="text-[13px] leading-relaxed text-muted text-pretty">
           Sin ella la app funciona entera, pero escribiendo a mano. Puedes añadirla luego en Ajustes.
         </p>
       </div>

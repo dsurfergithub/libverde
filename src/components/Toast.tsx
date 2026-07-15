@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { AlertTriangle, Check } from 'lucide-react'
+import { sfx } from '../lib/sound'
 
 interface Toast {
   id: number
@@ -16,6 +17,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const push = useCallback((message: string, tone: 'ok' | 'error' = 'ok') => {
     const id = Date.now() + Math.random()
+    // Sonido y visual en el mismo frame: la causalidad se pierde si se separan.
+    if (tone === 'error') sfx.error()
+    else sfx.save()
     setToasts((t) => [...t, { id, message, tone }])
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), tone === 'error' ? 5200 : 3000)
   }, [])
@@ -27,12 +31,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 top-3 z-60 flex flex-col items-center gap-2 px-4"
+        className="pointer-events-none fixed inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-60 flex flex-col items-center gap-2 px-4"
       >
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`animate-fade-in flex max-w-md items-start gap-2 rounded-lg border px-3 py-2 text-[13px] shadow-lg ${
+            className={`animate-toast-in flex max-w-md items-start gap-2 rounded-xl border px-3.5 py-2.5 text-[14px] shadow-lg ${
               t.tone === 'error'
                 ? 'border-pendiente/40 bg-pendiente-soft text-pendiente'
                 : 'border-line bg-surface text-ink'
