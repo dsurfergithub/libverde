@@ -172,9 +172,15 @@ export function Sheet({
     [onClose, springTo],
   )
 
+  // dismiss va por ref: si el efecto dependiera de él, cualquier padre que se
+  // re-renderice con un onClose inline (TimerBar late cada segundo) lo
+  // re-ejecutaría y panel.focus() robaría el foco al campo que estés escribiendo.
+  const dismissRef = useRef(dismiss)
+  dismissRef.current = dismiss
+
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && dismiss()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && dismissRef.current()
     document.addEventListener('keydown', onKey)
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -185,7 +191,7 @@ export function Sheet({
       document.body.style.overflow = prev
       cancelAnimationFrame(g.raf)
     }
-  }, [open, dismiss])
+  }, [open])
 
   if (!open) return null
 
